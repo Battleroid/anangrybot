@@ -6,24 +6,24 @@ class Markov(object):
 
     EOS = ('.', '!', '?')
 
-    def __init__(self, training_file):
+    def __init__(self, training_file, size=3):
         self.training_file = training_file
         self.lines = self.file_to_lines(self.training_file)
         self.database = dict()
-        self.build_database(self.lines)
+        self._build_database(self.lines, size)
 
     def file_to_lines(self, fo):
         lines = open(fo, 'r').readlines()
         return lines
 
-    def build_database(self, lines):
+    def _build_database(self, lines, size=3):
 
         def ngrams(line, n=3):
             return izip(*[line[i:] for i in range(n)])
 
         for line in lines:
             line = line.split()
-            for a, b, c in ngrams(line):
+            for a, b, c in ngrams(line, size):
                 state = (a, b)
                 rest = c
                 if state not in self.database:
@@ -41,7 +41,7 @@ class Markov(object):
             except KeyError:
                 break
             sentence.append(c)
-            if any([x for x in Markov.EOS if x in c]):
+            if c[-1] in Markov.EOS:
                 break
             a, b = b, c
         return ' '.join(sentence)
