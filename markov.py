@@ -19,6 +19,8 @@ class Markov(object):
     def _build_database(self, lines, size=3):
 
         def ngrams(line, n=3):
+            if line < n:
+                return
             return izip(*[line[i:] for i in range(n)])
 
         for line in lines:
@@ -31,11 +33,13 @@ class Markov(object):
                 if rest not in self.database[state]:
                     self.database[state] = [rest]
 
-    def generate(self):
+    def generate(self, limit=None):
         sentence = []
         seed = choice(self.database.keys())
         a, b = seed[0], seed[1]
         while True:
+            if limit and len(sentence) >= limit:
+                break
             try:
                 c = choice(self.database[(a, b)])
             except KeyError:
@@ -45,3 +49,16 @@ class Markov(object):
                 break
             a, b = b, c
         return ' '.join(sentence)
+
+if __name__ == '__main__':
+    import sys
+    if len(sys.argv) < 2 or any([x for x in sys.argv if x in \
+            ('-h', '--help')]):
+        print('Usage:')
+        print('  {} <training> [n]'.format(__file__))
+        sys.exit(0)
+
+    m = Markov(sys.argv[1])
+    n = int(sys.argv[2]) if len(sys.argv) > 2 else 1
+    for _ in range(n):
+        print m.generate()
