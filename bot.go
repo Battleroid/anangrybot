@@ -71,7 +71,6 @@ func main() {
 			}
 		},
 		Disconnect: func(e *gumble.DisconnectEvent) {
-			client.Self.Send("Bye!")
 			keep <- true
 		},
 	})
@@ -85,6 +84,8 @@ func main() {
 	<-keep
 
 	// on finish
-	defer f.Close()
 	defer w.Flush()
+	defer f.Close()
+
+	// TODO: handle ^C via os.Signal & signal.Notify (with os.Interrupt)?
 }
