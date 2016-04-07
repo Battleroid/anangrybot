@@ -78,6 +78,7 @@ func main() {
 	// connect
 	if err := client.Connect(); err != nil {
 		fmt.Println("Could not connect to server", config.Address)
+		os.Exit(1)
 	}
 
 	// keep it connected, yo
