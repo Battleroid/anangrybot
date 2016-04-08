@@ -65,7 +65,6 @@ class Markov(object):
 
 if __name__ == '__main__':
     args = docopt(__doc__)
-
     length = int(args['--length'])
     filename = args['<training_file>']
     times = int(args['<n>']) if args['<n>'] else 1
