@@ -5,6 +5,7 @@ Usage:
 Options:
     -h --help  Show this screen.
     -l --length=<len>  Set n-gram length [default: 2].
+    --limit=<lim>  Total number of words max per sentence.
 """
 
 from collections import defaultdict
@@ -22,7 +23,8 @@ import string
 
 class Markov(object):
 
-    def __init__(self, filename, length=2):
+    def __init__(self, filename, limit=None, length=2):
+        self.limit = limit
         self.length = length
         self.db = self.create_db(filename)
 
@@ -51,7 +53,7 @@ class Markov(object):
         current = seed
         while True:
             next_word = self.get_word(self.db[current])
-            if not next_word:
+            if (self.limit and len(sentence) >= self.limit) or not next_word:
                 return ''.join(' ' + w if not w.startswith("'") and w not in
                                string.punctuation else w for w in
                                sentence).strip()
@@ -65,9 +67,10 @@ class Markov(object):
 
 if __name__ == '__main__':
     args = docopt(__doc__)
+    limit = int(args['--limit']) if args['--limit'] else None
     length = int(args['--length'])
     filename = args['<training_file>']
     times = int(args['<n>']) if args['<n>'] else 1
-    m = Markov(filename, length)
+    m = Markov(filename, limit=limit, length=length)
     for _ in range(times):
         print m.gen()
