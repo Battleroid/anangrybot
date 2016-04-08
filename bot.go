@@ -55,9 +55,6 @@ func main() {
 			} else {
 				fmt.Println("Could not find channel", defaultChannel)
 			}
-			if client.Self.IsRegistered() == false {
-				client.Self.Register()
-			}
 			client.Self.SetComment(comment + "<br><br>Stored " + strconv.Itoa(words) + " lines this session")
 		},
 		TextMessage: func(e *gumble.TextMessageEvent) {
