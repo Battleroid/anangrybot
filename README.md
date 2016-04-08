@@ -7,8 +7,10 @@ I use collected text from a channel on a Mumble server to train a Markov chain g
 1. Install requirements with `$ pip install -r requirements.txt`
 2. You'll need _punkt_ and _words_ bundles for NLTK I believe (correct me if I'm wrong). So do...
 
+    ```
     >>> import nltk
     >>> nltk.download()
+    ```
 
 3. Follow the instructions from there to download the appropriate modules.
 4. Get a text file full of sample stuff to train it on and run it: `$ python markov.py stuff.txt`
