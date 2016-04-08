@@ -59,8 +59,8 @@ func main() {
 		},
 		TextMessage: func(e *gumble.TextMessageEvent) {
 			if u := e.Sender; u != nil {
-				fmt.Println("Caught:", e.Message)
-				w.WriteString(e.Message + "\n")
+				fmt.Println("Caught:", gumbleutil.PlainText(e.Message))
+				w.WriteString(gumbleutil.PlainText(e.Message) + "\n")
 				w.Flush()
 
 				words++
