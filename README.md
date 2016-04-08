@@ -16,6 +16,7 @@ I use collected text from a channel on a Mumble server to train a Markov chain g
 ### Options & Arguments
 
 Name | Description
+---- | -----------
 `-h --help` | Show this screen.
 `-l --length=<len>` | Set n-gram length [default: 2].
 `--limit=<lim>` | Total number of words max per sentence.
