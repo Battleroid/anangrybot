@@ -1,87 +1,74 @@
-import random
-import re
+"""
+Usage:
+    markov.py [options] <training_file> [<n>]
+
+Options:
+    -h --help  Show this screen.
+    -l --length=<len>  Set n-gram length [default: 2].
+"""
+
+from collections import defaultdict
+from collections import Counter
+from random import randrange
+from random import choice
+from itertools import izip
+from itertools import islice
+from nltk.tokenize import sent_tokenize
+from nltk.tokenize import word_tokenize
+from lxml import html
+from docopt import docopt
+import string
 
 
 class Markov(object):
 
-    def __init__(self, filename):
-        self.words = self.file_to_words(filename)
-        self.starters = []
-        self.temp_db = {}
-        self.db = {}
-        self.build_db(self.words)
+    def __init__(self, filename, length=2):
+        self.length = length
+        self.db = self.create_db(filename)
 
-    def caps(self, word):
-        if word.isupper() and word != 'I':
-            word = word.lower()
-        elif word[0].isupper():
-            word = word.lower().capitalize()
-        else:
-            word = word.lower()
-        return word
-
-    def file_to_words(self, filename):
+    def create_db(self, filename):
         with open(filename, 'r') as f:
-            words = [self.caps(w) for w in re.findall(r"[\w']+|[.,!?;]",
-                    f.read())]
-            return words
+            text = f.read()
+        text = html.document_fromstring(text).text_content()
 
-    def temp_mapping(self, head, tail):
-        while len(head) > 0:
-            key = tuple(head)
-            if key in self.temp_db:
-                if tail in self.temp_db[key]:
-                    self.temp_db[key][tail] += 1.0
-                else:
-                    self.temp_db[key][tail] = 1.0
-            else:
-                self.temp_db[key] = {}
-                self.temp_db[key][tail] = 1.0
-            head = head[1:]
+        db = defaultdict(Counter)
+        for sentence in sent_tokenize(text):
+            if sentence.isupper():
+                continue
+            words = [None] + word_tokenize(sentence) + [None]
+            grams = izip(*[words[i:] for i in range(self.length + 1)])
+            for group in grams:
+                gram = group[:self.length]
+                word = group[self.length]
+                db[gram][word] += 1
 
-    def build_db(self, words, length=1):
-        self.starters.append(words[0])
-        for i in range(1, len(words) - 1):
-            if i <= length:
-                head = words[:i + 1]
-            else:
-                head = words[i - length + 1:i + 1]
-            tail = words[i + 1]
-            if head[-1] in '.' and tail not in '.,!?;':
-                self.starters.append(tail)
-            self.temp_mapping(head, tail)
-        for s, e in self.temp_db.iteritems():
-            total = sum(e.values())
-            self.db[s] = dict([(k, v / total) for k, v in e.iteritems()])
+        return db
 
-    def next(self, previous):
-        sum = 0.0
-        r = ''
-        index = random.random()
-        while tuple(previous) not in self.db:
-            previous.pop(0)
-        for k, v in self.db[tuple(previous)].iteritems():
-            sum += v
-            if sum >= index and r == '':
-                r = k
-        return r
+    def gen(self):
+        starters = [w for w in self.db.keys() if w[0] is None]
+        seed = choice(starters)
+        sentence = list(seed[1:])
+        current = seed
+        while True:
+            next_word = self.get_word(self.db[current])
+            if not next_word:
+                return ''.join(' ' + w if not w.startswith("'") and w not in
+                               string.punctuation else w for w in
+                               sentence).strip()
+            sentence.append(next_word)
+            current = tuple(sentence[- self.length:])
 
-    def gen(self, length=1):
-        current = random.choice(self.starters)
-        gave = current.capitalize()
-        previous = [current]
-        while current not in '.':
-            current = self.next(previous)
-            previous.append(current)
-            if len(previous) > length:
-                previous.pop(0)
-            if current not in '.,!?;':
-                gave += ' '
-            gave += current
-        return gave
+    def get_word(self, freq):
+        ridx = randrange(sum(freq.values()))
+        return next(islice(freq.elements(), ridx, None))
 
 
 if __name__ == '__main__':
-    import sys
-    m = Markov(sys.argv[1])
-    print m.gen()
+    args = docopt(__doc__)
+
+    length = int(args['--length'])
+    filename = args['<training_file>']
+    times = int(args['<n>']) if args['<n>'] else 1
+    m = Markov(filename, length)
+    for _ in range(times):
+        print m.gen()
