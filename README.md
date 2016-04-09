@@ -7,7 +7,7 @@ I use collected text from a channel on a Mumble server to train a Markov chain g
 1. Install requirements with `$ pip install -r requirements.txt`
 2. You'll need _punkt_ and _words_ bundles for NLTK I believe (correct me if I'm wrong). So do...
 
-    ```
+    ```python
     >>> import nltk
     >>> nltk.download()
     ```
