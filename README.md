@@ -28,6 +28,6 @@ Name | Description
 ### Todo
 
 - [ ] bot needs to reconnect on disconnect (and so many retries)
-- [ ] needs to be restructured and ability to accept a range for length of generated sentence
+- [x] ~~needs to be restructured and ability to accept a range for length of generated sentence~~
 - [x] ~~maybe just write the generator in Go completely?~~
 - [x] ~~better handling of missing key~~
