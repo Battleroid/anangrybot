@@ -1,4 +1,4 @@
-# anangrybot
+# AnAngryBot
 
 I use collected text from a channel on a Mumble server to train a Markov chain generator. My implementation isn't the best, but it is functional. I need more practice.
 
