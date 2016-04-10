@@ -27,6 +27,9 @@ Name | Description
 
 ### Todo
 
+- [ ] markov generator needs to be able to save, load (pickle data) database to avoid rebuilding the database every single time you use it
+- [ ] generator needs a character limit
+- [ ] twitter dealio needs to be post _n_ so often, possibly reply to users
 - [ ] bot needs to reconnect on disconnect (and so many retries)
 - [x] ~~needs to be restructured and ability to accept a range for length of generated sentence~~
 - [x] ~~maybe just write the generator in Go completely?~~
