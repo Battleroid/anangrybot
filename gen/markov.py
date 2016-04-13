@@ -53,10 +53,15 @@ class Markov(object):
         current = seed
         while True:
             next_word = self.get_word(self.db[current])
-            if (self.limit and len(sentence) >= self.limit) or not next_word:
-                return ''.join(' ' + w if not w.startswith("'") and w not in
-                               string.punctuation else w for w in
-                               sentence).strip()
+            # check limits and empty word
+            if not next_word:
+                return Markov.prep(sentence)
+            if climit:
+                ts = sentence[:] + [next_word]
+                if len(Markov.prep(ts)) >= climit:
+                    return Markov.prep(sentence)[:climit]
+            if limit and len(sentence) >= limit:
+                return Markov.prep(sentence)
             sentence.append(next_word)
             current = tuple(sentence[- self.length:])
 
@@ -68,9 +73,10 @@ class Markov(object):
 if __name__ == '__main__':
     args = docopt(__doc__)
     limit = int(args['--limit']) if args['--limit'] else None
+    climit = int(args['--char']) if args['--char'] else None
     length = int(args['--length'])
     filename = args['<training_file>']
     times = int(args['<n>']) if args['<n>'] else 1
-    m = Markov(filename, limit=limit, length=length)
+    m = Markov(filename, length=length)
     for _ in range(times):
-        print m.gen()
+        print m.gen(limit, climit)
