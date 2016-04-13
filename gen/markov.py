@@ -6,6 +6,7 @@ Options:
     -h --help  Show this screen.
     -l --length=<len>  Set n-gram length [default: 2].
     --limit=<lim>  Total number of words max per sentence.
+    --char=<lim>  Maximum letters per sentence.
 """
 
 from collections import defaultdict
@@ -23,8 +24,7 @@ import string
 
 class Markov(object):
 
-    def __init__(self, filename, limit=None, length=2):
-        self.limit = limit
+    def __init__(self, filename, length=2):
         self.length = length
         self.db = self.create_db(filename)
 
