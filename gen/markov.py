@@ -46,7 +46,18 @@ class Markov(object):
 
         return db
 
-    def gen(self):
+    @staticmethod
+    def prep(sent):
+        sentence = ''
+        for word in sent:
+            if not word.startswith("'") and word not in string.punctuation:
+                sentence += ' ' + word
+            else:
+                sentence += word
+        sentence = sentence.strip()
+        return sentence
+
+    def gen(self, limit=None, climit=None):
         starters = [w for w in self.db.keys() if w[0] is None]
         seed = choice(starters)
         sentence = list(seed[1:])
