@@ -22,6 +22,7 @@ Name | Description
 `-h --help` | Show this screen.
 `-l --length=<len>` | Set n-gram length [default: 2].
 `--limit=<lim>` | Total number of words max per sentence.
+`--char=<lim>` | Maximum characters for generated sentence.
 `<training_file>` | File for use in building the n-gram cache.
 `[<n>]` | Number of sentences to generate.
 
