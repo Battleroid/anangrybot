@@ -21,7 +21,6 @@ from itertools import izip
 from itertools import islice
 from nltk.tokenize import sent_tokenize
 from nltk.tokenize import word_tokenize
-from lxml import html
 from docopt import docopt
 import cPickle as pickle
 import string
