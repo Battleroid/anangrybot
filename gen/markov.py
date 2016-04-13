@@ -3,10 +3,14 @@ Usage:
     markov.py [options] <training_file> [<n>]
 
 Options:
-    -h --help  Show this screen.
-    -l --length=<len>  Set n-gram length [default: 2].
-    --limit=<lim>  Total number of words max per sentence.
-    --char=<lim>  Maximum letters per sentence.
+    -h --help             Show this screen.
+    -p --pickle           Load training file as pickled data instead.
+    -s --save <pickle>    Save database as pickled data.
+    -u --update <pickle>  Update pickled database with given training file.
+    -l --length=<len>     Set n-gram length [default: 2].
+    -d                    Do not generate a saying.
+    --limit=<lim>         Total number of words max per sentence.
+    --char=<lim>          Maximum letters per sentence.
 """
 
 from collections import defaultdict
@@ -19,6 +23,7 @@ from nltk.tokenize import sent_tokenize
 from nltk.tokenize import word_tokenize
 from lxml import html
 from docopt import docopt
+import cPickle as pickle
 import string
 
 
@@ -26,7 +31,10 @@ class Markov(object):
 
     def __init__(self, filename, length=2):
         self.length = length
-        self.db = self.create_db(filename)
+        self.training = filename
+
+    def make_db(self):
+        self.db = self.create_db(self.training)
 
     def create_db(self, filename):
         with open(filename, 'r') as f:
@@ -80,14 +88,55 @@ class Markov(object):
         ridx = randrange(sum(freq.values()))
         return next(islice(freq.elements(), ridx, None))
 
+    def save_db(self, out='markov.pickle'):
+        f = open(out, 'wb')
+        pickle.dump(self.db, f)
+        f.close()
+
+    def load_db(self):
+        f = open(self.training, 'rb')
+        self.db = pickle.load(f)
+
+    def update_db(self, loc='markov.pickle'):
+        if not self.db:
+            self.db = self.make_db()
+        f = open(loc, 'rb')
+        existing = pickle.load(f)
+        self.db.update(existing)
+        self.save_db(loc)
+
 
 if __name__ == '__main__':
     args = docopt(__doc__)
+    update = args['--update']
+    save = args['--save']
+    pickled = args['--pickle']
     limit = int(args['--limit']) if args['--limit'] else None
     climit = int(args['--char']) if args['--char'] else None
     length = int(args['--length'])
+    dont = args['-d']
     filename = args['<training_file>']
     times = int(args['<n>']) if args['<n>'] else 1
+
+    # create markov obj and do required junk
     m = Markov(filename, length=length)
+    # m.make_db()
+
+    if update:
+        m.make_db()
+        m.update_db(update)
+    elif save:
+        m.make_db()
+        m.save_db(save)
+    elif pickled:
+        m.load_db()
+    else:
+        m.make_db()
+
+    if dont:
+        import sys
+        sys.exit(0)
+
+    # if no pickling params
     for _ in range(times):
         print m.gen(limit, climit)
