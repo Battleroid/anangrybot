@@ -18,12 +18,20 @@ import tweepy
 
 class Listener(tweepy.StreamListener):
 
-    def __init__(self, markov, api=None):
+    def __init__(self, markov, is_pickled, api=None):
         super(Listener, self).__init__(api)
         self.markov = markov
+        self.is_pickled = is_pickled
 
     def on_status(self, status):
         user = status.author.screen_name
+
+        # save data if not pickled, quick solution for 'learning'
+        if not self.is_pickled:
+            print 'Saving to {}: {}'.format(self.markov.training, status.text)
+            f = open(self.markov.training, 'a')
+            f.write('\n' + status.text)
+
         try:
             message = '@' + user + ' '
             message += self.markov.gen(climit=140 - len(message))
@@ -64,7 +72,7 @@ def main(params, tracklist):
 
     # listener
     print 'Starting listener for "{}"...'.format(', '.join(tracklist))
-    listener = Listener(m, api=api)
+    listener = Listener(m, is_pickled, api=api)
     stream = tweepy.Stream(auth, listener)
     stream.filter(track=tracklist)
 
