@@ -38,7 +38,6 @@ class Markov(object):
     def create_db(self, filename):
         with open(filename, 'r') as f:
             text = f.read()
-        text = html.document_fromstring(text).text_content()
 
         db = defaultdict(Counter)
         for sentence in sent_tokenize(text):
