@@ -32,6 +32,14 @@ class Listener(tweepy.StreamListener):
         except tweepy.error.RateLimitError, e:
             print e
 
+    def on_error(self, status_code):
+        print 'Given status code ' + str(status_code)
+        return True
+
+    def on_timeout(self):
+        print 'Timed out'
+        return True
+
 
 def main(params, tracklist):
     # twitter info
